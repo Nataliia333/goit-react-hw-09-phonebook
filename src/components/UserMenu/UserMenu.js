@@ -22,12 +22,3 @@ export default function UserMenu() {
     </div>
   );
 }
-
-// const mapStateToProps = state => ({
-//   name: authSelectors.getUsername(state),
-//   avatar: defaultAvatar,
-// });
-
-// const mapDispatchToProps = {
-//   onLogout: authOperations.logOut,
-// };
