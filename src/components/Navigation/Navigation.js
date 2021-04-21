@@ -30,8 +30,3 @@ export default function Navigation() {
     </nav>
   );
 }
-// const mapStateToProps = state => ({
-//   isLoggedIn: authSelectors.getIsAuthenticated(state),
-// });
-
-// export default connect(mapStateToProps, null)(Navigation);

@@ -1,21 +1,24 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useEffect, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+// import deleteContact from '../../redux/contacts/contacts-operations';
 import contactsOperations from '../../redux/contacts/contacts-operations';
 import contactsSelectors from '../../redux/contacts/contacts-selectors';
 import styles from './ContactsList.module.css';
 
-const ContactsList = ({
-  contacts,
-  isLoadingContacts,
-  onDelete,
-  fetchContacts,
-}) => {
-  useEffect(() => fetchContacts(), []);
+export default function ContactsList() {
+  const dispatch = useDispatch();
+  const contacts = useSelector(contactsSelectors.getVisibleContacts);
+  const isLoadingContacts = useSelector(contactsSelectors.getLoading);
+  const value = useSelector(contactsSelectors.getFilter);
 
-  const handlerDelete = event => {
-    onDelete(event.currentTarget.id);
-  };
+  useEffect(() => dispatch(contactsOperations.fetchContacts()), [dispatch]);
+
+  const handlerDelete = useCallback(
+    e => {
+      dispatch(contactsOperations.deleteContact(value));
+    },
+    [dispatch, value],
+  );
 
   return (
     <ul>
@@ -35,24 +38,4 @@ const ContactsList = ({
       ))}
     </ul>
   );
-};
-
-const mapStateToProps = state => {
-  return {
-    contacts: contactsSelectors.getVisibleContacts(state),
-    filter: contactsSelectors.getFilter(state),
-    isLoadingContacts: contactsSelectors.getLoading(state),
-  };
-};
-
-const mapDispatchProps = dispatch => ({
-  fetchContacts: () => dispatch(contactsOperations.fetchContacts()),
-  onDelete: value => dispatch(contactsOperations.deleteContact(value)),
-});
-
-ContactsList.propTypes = {
-  contacts: PropTypes.arrayOf(PropTypes.object),
-  onDelete: PropTypes.func.isRequired,
-};
-
-export default connect(mapStateToProps, mapDispatchProps)(ContactsList);
+}
