@@ -1,29 +1,38 @@
-import { connect } from 'react-redux';
+import React, { useState, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import contactsOperations from '../../redux/contacts/contacts-operations';
-import contactsSelectors from '../../redux/contacts/contacts-selectors';
-
-import PropTypes from 'prop-types';
+// import contactsSelectors from '../../redux/contacts/contacts-selectors';
 
 import styles from './ContactForm.module.css';
 
-const ContactForm = ({ contacts, onAdd }) => {
-  let item = { name: '', number: '' };
+export default function ContactForm({ onAdd }) {
+  const dispatch = useDispatch();
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  const onInputChange = event => {
-    item = { ...item, [event.target.id]: event.target.value };
-  };
+  const onInputChange = useCallback(e => {
+    setName(e.currentTarget.value);
+    setNumber(e.currentTarget.value);
+  }, []);
 
-  const isAlreadyContact = () => {
-    const Names = contacts.map(contact => contact.name);
-    return Names.includes(item.name);
-  };
+  const onSave = useCallback(
+    e => {
+      e.preventDefault();
 
-  const onSave = event => {
-    event.preventDefault();
-    isAlreadyContact()
-      ? alert(`${item.name} is already in contacts.`)
-      : onAdd(item);
-  };
+      if (name === '') {
+        return alert('Заполни');
+      }
+      if (number === '') {
+        return alert('Заполни');
+      }
+
+      dispatch(contactsOperations.addContact({ name, number }));
+      onAdd();
+      setName('');
+      setNumber('');
+    },
+    [dispatch, name, number, onAdd],
+  );
 
   return (
     <form className={styles.ContactForm}>
@@ -36,23 +45,4 @@ const ContactForm = ({ contacts, onAdd }) => {
       </button>
     </form>
   );
-};
-
-const mapStateToProps = state => {
-  return {
-    contacts: contactsSelectors.getContacts(state),
-  };
-};
-
-const mapDispatchProps = dispatch => {
-  return {
-    onAdd: value => dispatch(contactsOperations.addContact(value)),
-  };
-};
-
-ContactForm.propTypes = {
-  contacts: PropTypes.arrayOf(PropTypes.object),
-  onAdd: PropTypes.func.isRequired,
-};
-
-export default connect(mapStateToProps, mapDispatchProps)(ContactForm);
+}
